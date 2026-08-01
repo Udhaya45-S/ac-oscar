@@ -40,80 +40,162 @@
         <div class="dashboard-header glass-card">
             <div class="db-title-area">
                 <h2><i class="fa-solid fa-chart-line"></i> Admin Control Panel</h2>
-                <p>Welcome back, <strong class="accent-text">yuvi</strong> | Manage appointments & tracking statuses</p>
+                <p>Manage appointments, tracking statuses & staff salary records</p>
             </div>
             <a href="/api/admin/logout" class="btn btn-danger" id="adminLogoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
 
-        <!-- Dashboard Quick Stats -->
-        <div class="stats-grid">
-            <div class="stat-card glass-card">
-                <div class="stat-icon stat-blue"><i class="fa-solid fa-folder-open"></i></div>
-                <div class="stat-data">
-                    <h3 id="statTotal">0</h3>
-                    <p>Total Bookings</p>
-                </div>
-            </div>
-            <div class="stat-card glass-card">
-                <div class="stat-icon stat-yellow"><i class="fa-solid fa-calendar-day"></i></div>
-                <div class="stat-data">
-                    <h3 id="statBooked">0</h3>
-                    <p>Booked (New)</p>
-                </div>
-            </div>
-            <div class="stat-card glass-card">
-                <div class="stat-icon stat-cyan"><i class="fa-solid fa-arrows-spin animate-spin-slow"></i></div>
-                <div class="stat-data">
-                    <h3 id="statProcessing">0</h3>
-                    <p>Processing</p>
-                </div>
-            </div>
-            <div class="stat-card glass-card">
-                <div class="stat-icon stat-green"><i class="fa-solid fa-circle-check"></i></div>
-                <div class="stat-data">
-                    <h3 id="statCompleted">0</h3>
-                    <p>Completed</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Controls (Filter and Search) -->
-        <div class="controls-card glass-card">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="dbSearchInput" placeholder="Search by name, phone, or tracking code...">
-            </div>
+        <!-- Top-level section tabs -->
+        <div class="controls-card glass-card" style="margin-bottom: 20px;">
             <div class="filter-tabs">
-                <button class="filter-tab active" data-filter="all">All</button>
-                <button class="filter-tab" data-filter="Booked">Booked</button>
-                <button class="filter-tab" data-filter="Processing">Processing</button>
-                <button class="filter-tab" data-filter="Completed">Completed</button>
+                <button class="filter-tab active" data-section="bookings">
+                    <i class="fa-solid fa-folder-open"></i> Bookings
+                </button>
+                <button class="filter-tab" data-section="employees">
+                    <i class="fa-solid fa-id-badge"></i> Employees & Salary
+                </button>
             </div>
         </div>
 
-        <!-- Bookings Table Container -->
-        <div class="table-container glass-card">
-            <table class="bookings-table" id="bookingsTable">
-                <thead>
-                    <tr>
-                        <th>Date Booked</th>
-                        <th>Tracking Code</th>
-                        <th>Customer</th>
-                        <th>Phone</th>
-                        <th>AC Type</th>
-                        <th>Description</th>
-                        <th>Pref. Slot</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="bookingsTableBody">
-                    <tr>
-                        <td colspan="8" class="table-loading">
-                            <i class="fa-solid fa-circle-notch fa-spin"></i> Fetching records from database...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- ===================== BOOKINGS SECTION ===================== -->
+        <div id="bookingsSection">
+            <!-- Dashboard Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-blue"><i class="fa-solid fa-folder-open"></i></div>
+                    <div class="stat-data">
+                        <h3 id="statTotal">0</h3>
+                        <p>Total Bookings</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-yellow"><i class="fa-solid fa-calendar-day"></i></div>
+                    <div class="stat-data">
+                        <h3 id="statBooked">0</h3>
+                        <p>Booked (New)</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-cyan"><i class="fa-solid fa-arrows-spin animate-spin-slow"></i></div>
+                    <div class="stat-data">
+                        <h3 id="statProcessing">0</h3>
+                        <p>Processing</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="stat-data">
+                        <h3 id="statCompleted">0</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls (Filter and Search) -->
+            <div class="controls-card glass-card">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="dbSearchInput" placeholder="Search by name, phone, or tracking code...">
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="Booked">Booked</button>
+                    <button class="filter-tab" data-filter="Processing">Processing</button>
+                    <button class="filter-tab" data-filter="Completed">Completed</button>
+                </div>
+            </div>
+
+            <!-- Bookings Table Container -->
+            <div class="table-container glass-card">
+                <table class="bookings-table" id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>Date Booked</th>
+                            <th>Tracking Code</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>AC Type</th>
+                            <th>Description</th>
+                            <th>Pref. Slot</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody">
+                        <tr>
+                            <td colspan="8" class="table-loading">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Fetching records from database...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===================== EMPLOYEES SECTION ===================== -->
+        <div id="employeesSection" class="hide">
+            <div class="controls-card glass-card" style="justify-content: flex-end;">
+                <button class="btn btn-primary" id="btnAddEmployee"><i class="fa-solid fa-plus"></i> Add Employee</button>
+            </div>
+
+            <div class="table-container glass-card">
+                <table class="bookings-table" id="employeesTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Phone</th>
+                            <th>Monthly Salary (₹)</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTableBody">
+                        <tr>
+                            <td colspan="6" class="table-loading">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Fetching employee records...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Employee Add/Edit Modal -->
+        <div class="modal-overlay hide" id="employeeModal">
+            <div class="modal-card glass-card animate-zoom">
+                <div class="modal-header">
+                    <h2 id="employeeModalTitle">Add Employee</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="employeeForm" autocomplete="off">
+                        <input type="hidden" id="empId">
+                        <div class="form-group">
+                            <label for="empName"><i class="fa-solid fa-user"></i> Full Name <span class="required">*</span></label>
+                            <input type="text" id="empName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="empRole"><i class="fa-solid fa-toolbox"></i> Role <span class="required">*</span></label>
+                            <input type="text" id="empRole" placeholder="e.g. Technician, Coordinator" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="empPhone"><i class="fa-solid fa-phone"></i> Phone</label>
+                            <input type="tel" id="empPhone" placeholder="9150821143">
+                        </div>
+                        <div class="form-group">
+                            <label for="empSalary"><i class="fa-solid fa-indian-rupee-sign"></i> Monthly Salary <span class="required">*</span></label>
+                            <input type="number" id="empSalary" step="0.01" min="0" required>
+                        </div>
+                        <div class="error-box hide" id="employeeError">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span id="employeeErrorText"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="btnSaveEmployee">Save</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="btnCloseEmployeeModal">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
     {% endif %}
