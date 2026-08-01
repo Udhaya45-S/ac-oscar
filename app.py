@@ -10,6 +10,7 @@ except ImportError:
     pass
 
 import db
+import notifications
 
 app = Flask(__name__)
 
@@ -28,10 +29,19 @@ if not ADMIN_PASSCODE:
         "Set it before starting the app (see .env.example)."
     )
 
+# Ensure DB & tables exist whenever this module loads — this runs under
+# gunicorn too (not just `python app.py`), so production deploys always
+# have the schema in place.
+db.init_db()
+
 
 @app.before_request
 def check_admin_session():
-    allowed_endpoints = {'admin_portal', 'admin_login', 'admin_logout', 'admin_bookings', 'admin_update_status', 'static'}
+    allowed_endpoints = {
+        'admin_portal', 'admin_login', 'admin_logout', 'static',
+        'admin_bookings', 'admin_update_status',
+        'admin_employees', 'admin_add_employee', 'admin_update_employee', 'admin_delete_employee',
+    }
     if not request.endpoint or request.endpoint not in allowed_endpoints:
         session.pop('admin_logged_in', None)
 
@@ -55,6 +65,20 @@ def serialize_booking(b):
         res['preferred_date'] = res['preferred_date'].strftime('%Y-%m-%d')
     if res.get('created_at'):
         res['created_at'] = res['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+    return res
+
+
+def serialize_employee(e):
+    """Formats employee database fields for JSON response."""
+    if not e:
+        return None
+    res = e.copy()
+    if res.get('monthly_salary') is not None:
+        res['monthly_salary'] = float(res['monthly_salary'])
+    if res.get('created_at'):
+        res['created_at'] = res['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+    if res.get('updated_at'):
+        res['updated_at'] = res['updated_at'].strftime('%Y-%m-%d %H:%M:%S')
     return res
 
 
@@ -86,6 +110,9 @@ def book_repair():
 
     try:
         code = db.add_booking(name, phone, email, ac_type, issue, pref_date, pref_time)
+        # Notify the customer on their booking phone number. This never
+        # blocks or fails the booking itself — see notifications.py.
+        notifications.send_booking_confirmation_sms(phone, name, code)
         return jsonify({'success': True, 'tracking_code': code})
     except Exception as e:
         app.logger.exception("Error adding booking")
@@ -149,6 +176,10 @@ def admin_update_status():
     try:
         success = db.update_status(tracking_code, new_status)
         if success:
+            # Best-effort SMS to the customer about their status change.
+            booking = db.get_booking(tracking_code)
+            if booking:
+                notifications.send_status_update_sms(booking['phone'], tracking_code, new_status)
             return jsonify({'success': True, 'message': f'Status updated to {new_status}'})
         else:
             return jsonify({'success': False, 'error': 'Booking not found or status not changed.'}), 404
@@ -159,7 +190,90 @@ def admin_update_status():
         return jsonify({'success': False, 'error': 'Something went wrong while updating status.'}), 500
 
 
-db.init_db()
+# ---------------------------------------------------------------------------
+# Employee salary management — admin-only. Every route below is protected by
+# admin_api_required and also listed in allowed_endpoints above so a logged
+# out session can't reach it.
+# ---------------------------------------------------------------------------
+
+@app.route('/api/admin/employees', methods=['GET'])
+@admin_api_required
+def admin_employees():
+    try:
+        employees = db.get_all_employees()
+        serialized = [serialize_employee(e) for e in employees]
+        return jsonify({'success': True, 'employees': serialized})
+    except Exception as e:
+        app.logger.exception("Error fetching employees")
+        return jsonify({'success': False, 'error': 'Something went wrong while fetching employees.'}), 500
+
+
+@app.route('/api/admin/employees', methods=['POST'])
+@admin_api_required
+def admin_add_employee():
+    data = request.json or {}
+    full_name = data.get('full_name')
+    role = data.get('role')
+    phone = data.get('phone')
+    monthly_salary = data.get('monthly_salary')
+
+    if not all([full_name, role]) or monthly_salary in (None, ''):
+        return jsonify({'success': False, 'error': 'Name, role, and salary are required.'}), 400
+
+    try:
+        monthly_salary = float(monthly_salary)
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'error': 'Salary must be a number.'}), 400
+
+    try:
+        new_id = db.add_employee(full_name, role, phone, monthly_salary)
+        return jsonify({'success': True, 'id': new_id})
+    except Exception as e:
+        app.logger.exception("Error adding employee")
+        return jsonify({'success': False, 'error': 'Something went wrong while adding the employee.'}), 500
+
+
+@app.route('/api/admin/employees/<int:employee_id>', methods=['PUT'])
+@admin_api_required
+def admin_update_employee(employee_id):
+    data = request.json or {}
+    full_name = data.get('full_name')
+    role = data.get('role')
+    phone = data.get('phone')
+    monthly_salary = data.get('monthly_salary')
+
+    if not all([full_name, role]) or monthly_salary in (None, ''):
+        return jsonify({'success': False, 'error': 'Name, role, and salary are required.'}), 400
+
+    try:
+        monthly_salary = float(monthly_salary)
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'error': 'Salary must be a number.'}), 400
+
+    try:
+        success = db.update_employee(employee_id, full_name, role, phone, monthly_salary)
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Employee not found.'}), 404
+    except Exception as e:
+        app.logger.exception("Error updating employee")
+        return jsonify({'success': False, 'error': 'Something went wrong while updating the employee.'}), 500
+
+
+@app.route('/api/admin/employees/<int:employee_id>', methods=['DELETE'])
+@admin_api_required
+def admin_delete_employee(employee_id):
+    try:
+        success = db.delete_employee(employee_id)
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Employee not found.'}), 404
+    except Exception as e:
+        app.logger.exception("Error deleting employee")
+        return jsonify({'success': False, 'error': 'Something went wrong while deleting the employee.'}), 500
+
 
 if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
