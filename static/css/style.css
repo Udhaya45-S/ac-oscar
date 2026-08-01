@@ -1298,3 +1298,38 @@ textarea {
         gap: 4px;
     }
 }
+.btn-icon {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-secondary, #aaa);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 6px;
+    transition: all 0.2s ease;
+}
+ 
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+ 
+.btn-icon.btn-delete-emp:hover,
+.btn-delete-emp:hover {
+    color: var(--color-danger, #ff4d4f);
+    border-color: var(--color-danger, #ff4d4f);
+}
+ 
+.btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary, #fff);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+ 
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
