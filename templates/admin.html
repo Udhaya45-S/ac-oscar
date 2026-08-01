@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Oscar Air Care - Admin Portal{% endblock %}
+
+{% block content %}
+<section class="admin-section container">
+    {% if not logged_in %}
+    <!-- Admin Login Card -->
+    <div class="login-wrapper">
+        <div class="glass-card login-card animate-zoom">
+            <div class="login-header">
+                <i class="fa-solid fa-user-shield admin-shield-icon"></i>
+                <h2>Admin Login</h2>
+                <p>Enter credentials to access Oscar Air Care database portal.</p>
+            </div>
+            <form id="adminLoginForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="adminUsername"><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="adminUsername" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPasscode"><i class="fa-solid fa-lock"></i> Passcode</label>
+                    <input type="password" id="adminPasscode" placeholder="Enter passcode" required>
+                </div>
+                <div class="error-box hide" id="loginError">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="loginErrorText">Invalid username or passcode</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="btnLoginSubmit">
+                    <span id="loginBtnText">Authenticate</span>
+                    <i class="fa-solid fa-circle-notch fa-spin hide" id="loginSpinner"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <!-- Admin Dashboard -->
+    <div class="dashboard-wrapper">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header glass-card">
+            <div class="db-title-area">
+                <h2><i class="fa-solid fa-chart-line"></i> Admin Control Panel</h2>
+                <p>Welcome back, <strong class="accent-text">yuvi</strong> | Manage appointments & tracking statuses</p>
+            </div>
+            <a href="/api/admin/logout" class="btn btn-danger" id="adminLogoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </div>
+
+        <!-- Dashboard Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card glass-card">
+                <div class="stat-icon stat-blue"><i class="fa-solid fa-folder-open"></i></div>
+                <div class="stat-data">
+                    <h3 id="statTotal">0</h3>
+                    <p>Total Bookings</p>
+                </div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon stat-yellow"><i class="fa-solid fa-calendar-day"></i></div>
+                <div class="stat-data">
+                    <h3 id="statBooked">0</h3>
+                    <p>Booked (New)</p>
+                </div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon stat-cyan"><i class="fa-solid fa-arrows-spin animate-spin-slow"></i></div>
+                <div class="stat-data">
+                    <h3 id="statProcessing">0</h3>
+                    <p>Processing</p>
+                </div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon stat-green"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="stat-data">
+                    <h3 id="statCompleted">0</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls (Filter and Search) -->
+        <div class="controls-card glass-card">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="dbSearchInput" placeholder="Search by name, phone, or tracking code...">
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All</button>
+                <button class="filter-tab" data-filter="Booked">Booked</button>
+                <button class="filter-tab" data-filter="Processing">Processing</button>
+                <button class="filter-tab" data-filter="Completed">Completed</button>
+            </div>
+        </div>
+
+        <!-- Bookings Table Container -->
+        <div class="table-container glass-card">
+            <table class="bookings-table" id="bookingsTable">
+                <thead>
+                    <tr>
+                        <th>Date Booked</th>
+                        <th>Tracking Code</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>AC Type</th>
+                        <th>Description</th>
+                        <th>Pref. Slot</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingsTableBody">
+                    <tr>
+                        <td colspan="8" class="table-loading">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i> Fetching records from database...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Toast Notification -->
+<div class="toast hide" id="adminToast">
+    <i class="fa-solid fa-check-circle toast-icon"></i>
+    <span id="toastMessage">Status updated successfully!</span>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if not logged_in %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('adminLoginForm');
+        const submitBtn = document.getElementById('btnLoginSubmit');
+        const btnText = document.getElementById('loginBtnText');
+        const spinner = document.getElementById('loginSpinner');
+        const errorBox = document.getElementById('loginError');
+        const errorText = document.getElementById('loginErrorText');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show Loading state
+            submitBtn.disabled = true;
+            btnText.textContent = "Authenticating...";
+            spinner.classList.remove('hide');
+            errorBox.classList.add('hide');
+
+            const username = document.getElementById('adminUsername').value.trim();
+            const passcode = document.getElementById('adminPasscode').value.trim();
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, passcode })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    // Set tab session active flag
+                    sessionStorage.setItem('admin_session_active', 'true');
+                    // Reload page to display dashboard
+                    window.location.reload();
+                } else {
+                    throw new Error(result.error || 'Login failed');
+                }
+            } catch (err) {
+                errorBox.classList.remove('hide');
+                errorText.textContent = err.message;
+                submitBtn.disabled = false;
+                btnText.textContent = "Authenticate";
+                spinner.classList.add('hide');
+            }
+        });
+    });
+</script>
+{% else %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endif %}
+{% endblock %}
