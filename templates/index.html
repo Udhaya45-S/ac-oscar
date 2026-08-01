@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Oscar Air Care - AC Repair, Installation & Servicing in Chennai{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="home" class="hero-section">
+    <div class="hero-bg-accent"></div>
+    <div class="container hero-container">
+        <div class="hero-content">
+            <span class="badge"><i class="fa-solid fa-wind animate-pulse"></i> Keep Cool and Fresh</span>
+            <h1>Experiencing AC Trouble? We have the <span class="gradient-text">Coolest Solution</span>.</h1>
+            <p>Oscar Air Care provides professional, quick-response AC repair, maintenance, and gas charging services in Arumbakkam and across Chennai. Quality service guaranteed.</p>
+            <div class="hero-actions">
+                <a href="#book" class="btn btn-primary btn-lg"><i class="fa-solid fa-calendar-check"></i> Book a Repair</a>
+                <a href="#track" class="btn btn-secondary btn-lg"><i class="fa-solid fa-magnifying-glass"></i> Track Booking</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="glass-card ac-feature-card">
+                <div class="ac-icon-box">
+                    <i class="fa-solid fa-snowflake"></i>
+                </div>
+                <div class="ac-feature-info">
+                    <h3>Swift Service</h3>
+                    <p>Same-day diagnostics and repair by expert technicians.</p>
+                </div>
+            </div>
+            <div class="glass-card phone-card">
+                <div class="phone-icon-box">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="phone-info">
+                    <h4>Direct Call</h4>
+                    <p><a href="tel:9150821143">9150821143</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="services-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="sub-title">What We Do</span>
+            <h2>Our Premium Services</h2>
+            <p>From quick filter cleaning to complex compressor rebuilds, our certified technicians handle it all.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                <h3>AC Repair & Fix</h3>
+                <p>Troubleshooting cooling issues, sensor faults, fan failures, and electrical problems with speed.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                <h3>Gas Charging</h3>
+                <p>Professional vacuuming, leak detection, and precision gas filling for eco-friendly refrigerants.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-wind"></i></div>
+                <h3>Deep Wet Wash</h3>
+                <p>High-pressure jet wash cleaning of outdoor and indoor coils, drain pipes, and blower wheels.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-toolbox"></i></div>
+                <h3>AC Installation</h3>
+                <p>Perfect split and window AC mounting, copper piping layout, insulation, and initial testing.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Form Section -->
+<section id="book" class="booking-section">
+    <div class="container booking-container">
+        <div class="booking-info">
+            <span class="badge badge-outline">EASY BOOKING</span>
+            <h2>Book Your AC Service Instantly</h2>
+            <p>Fill out the form with your details, choose a preferred slot, and we'll assign a technician. You'll receive a unique tracking code to follow your request status.</p>
+            
+            <div class="info-list">
+                <div class="info-item">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>No hidden charges, honest pricing</span>
+                </div>
+                <div class="info-item">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Genuine spare parts and warranties</span>
+                </div>
+                <div class="info-item">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Certified & verified service engineers</span>
+                </div>
+            </div>
+        </div>
+        <div class="booking-card-wrapper">
+            <div class="booking-form-card">
+                <form id="bookingForm" autocomplete="off">
+                    <div class="form-group">
+                        <label for="customerName"><i class="fa-solid fa-user"></i> Full Name <span class="required">*</span></label>
+                        <input type="text" id="customerName" name="name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerPhone"><i class="fa-solid fa-phone"></i> Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="customerPhone" name="phone" placeholder="9150821143" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerEmail"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                            <input type="email" id="customerEmail" name="email" placeholder="john@example.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="acType"><i class="fa-solid fa-snowflake"></i> AC Type <span class="required">*</span></label>
+                        <select id="acType" name="ac_type" required>
+                            <option value="" disabled selected>Select AC Type</option>
+                            <option value="Split AC">Split AC</option>
+                            <option value="Window AC">Window AC</option>
+                            <option value="Inverter AC">Inverter AC</option>
+                            <option value="Cassette AC">Cassette AC</option>
+                            <option value="Central AC">Central AC</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="issueDescription"><i class="fa-solid fa-circle-info"></i> Describe the Problem <span class="required">*</span></label>
+                        <textarea id="issueDescription" name="issue" placeholder="Explain what is wrong (e.g., AC not cooling, making noise, water leaking)" rows="3" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="preferredDate"><i class="fa-solid fa-calendar"></i> Preferred Date <span class="required">*</span></label>
+                            <input type="date" id="preferredDate" name="pref_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferredTime"><i class="fa-solid fa-clock"></i> Preferred Time <span class="required">*</span></label>
+                            <select id="preferredTime" name="pref_time" required>
+                                <option value="" disabled selected>Select Time Slot</option>
+                                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                                <option value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</option>
+                                <option value="Evening (4 PM - 8 PM)">Evening (4 PM - 8 PM)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btnSubmitBooking">
+                        <span id="btnText">Confirm Booking</span>
+                        <i class="fa-solid fa-circle-notch fa-spin hide" id="btnSpinner"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tracking Section -->
+<section id="track" class="tracking-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="sub-title">Check Progress</span>
+            <h2>Track Your Booking Status</h2>
+            <p>Enter the 10-character unique tracking code (e.g., OAC-XXXXXX) provided during booking to check real-time progress.</p>
+        </div>
+        <div class="tracking-search-box glass-card">
+            <form id="trackingForm" class="tracking-form">
+                <input type="text" id="trackingCodeInput" placeholder="Enter Tracking Code (e.g. OAC-ABC123)" required>
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Track</button>
+            </form>
+        </div>
+
+        <div id="trackingResult" class="tracking-result-container hide">
+            <!-- Dynamic Tracking Card -->
+            <div class="booking-status-card glass-card">
+                <div class="status-card-header">
+                    <h3>Booking Reference: <span id="resTrackingCode" class="accent-text">OAC-XXXXXX</span></h3>
+                    <span id="resStatusBadge" class="status-badge status-booked">Booked</span>
+                </div>
+                <div class="status-progress-bar">
+                    <div class="progress-line">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="step active" id="step-booked">
+                        <div class="step-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                        <div class="step-label">Booked</div>
+                    </div>
+                    <div class="step" id="step-processing">
+                        <div class="step-icon"><i class="fa-solid fa-gears"></i></div>
+                        <div class="step-label">Processing</div>
+                    </div>
+                    <div class="step" id="step-completed">
+                        <div class="step-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="step-label">Completed</div>
+                    </div>
+                </div>
+                <div class="status-details">
+                    <div class="detail-row">
+                        <span>Customer Name:</span>
+                        <strong id="resCustName">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>AC Type:</span>
+                        <strong id="resAcType">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Preferred Appointment:</span>
+                        <strong id="resDateTime">-</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Issue Description:</span>
+                        <p id="resIssue">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="trackingError" class="tracking-error-message hide">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <span id="trackingErrorText">No booking found with this tracking code.</span>
+        </div>
+    </div>
+</section>
+
+<!-- Success Modal -->
+<div class="modal-overlay hide" id="successModal">
+    <div class="modal-card glass-card animate-zoom">
+        <div class="modal-header">
+            <i class="fa-solid fa-circle-check success-icon"></i>
+            <h2>Booking Confirmed!</h2>
+        </div>
+        <div class="modal-body">
+            <p>Thank you, <strong id="modalCustName">John</strong>. Your AC repair booking has been successfully saved in our database.</p>
+            <div class="code-box">
+                <p class="code-label">YOUR UNIQUE TRACKING CODE</p>
+                <div class="code-display">
+                    <span id="modalTrackingCode">OAC-ABC123</span>
+                    <button class="btn-copy" id="btnCopyCode" title="Copy tracking code"><i class="fa-solid fa-copy"></i></button>
+                </div>
+            </div>
+            <p class="modal-instruction">Keep this code safe. You can use it in the <strong>Track Status</strong> section to monitor your service process (Booked &rarr; Processing &rarr; Completed).</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="btnCloseModal">Close & Continue</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
