@@ -54,6 +54,12 @@
                 <button class="filter-tab" data-section="employees">
                     <i class="fa-solid fa-id-badge"></i> Employees & Salary
                 </button>
+                <button class="filter-tab" data-section="analytics">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
+                </button>
+                <button class="filter-tab" data-section="reviews">
+                    <i class="fa-solid fa-star"></i> Reviews
+                </button>
             </div>
         </div>
 
@@ -160,6 +166,116 @@
             </div>
         </div>
 
+        <!-- ===================== ANALYTICS SECTION ===================== -->
+        <div id="analyticsSection" class="hide">
+            <!-- This Month Stats -->
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-blue"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="stat-data">
+                        <h3 id="anTotalMonth">0</h3>
+                        <p>Bookings This Month</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                    <div class="stat-data">
+                        <h3 id="anRevenueMonth">₹0</h3>
+                        <p>Estimated Revenue This Month</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-yellow"><i class="fa-solid fa-calendar-day"></i></div>
+                    <div class="stat-data">
+                        <h3 id="anBusiestDay">-</h3>
+                        <p>Busiest Day</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-cyan"><i class="fa-solid fa-clock"></i></div>
+                    <div class="stat-data">
+                        <h3 id="anBusiestSlot">-</h3>
+                        <p>Busiest Time Slot</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="table-container glass-card chart-card">
+                    <h3 class="chart-title"><i class="fa-solid fa-chart-column"></i> Last 6 Months — Bookings & Revenue</h3>
+                    <canvas id="chartMonthlyTrend"></canvas>
+                </div>
+                <div class="table-container glass-card chart-card">
+                    <h3 class="chart-title"><i class="fa-solid fa-calendar-week"></i> Busy Days of the Week</h3>
+                    <canvas id="chartBusyDays"></canvas>
+                </div>
+                <div class="table-container glass-card chart-card">
+                    <h3 class="chart-title"><i class="fa-solid fa-clock"></i> Busy Time Slots</h3>
+                    <canvas id="chartBusySlots"></canvas>
+                </div>
+                <div class="table-container glass-card chart-card">
+                    <h3 class="chart-title"><i class="fa-solid fa-snowflake"></i> Bookings by AC Type (All Time)</h3>
+                    <canvas id="chartAcType"></canvas>
+                </div>
+            </div>
+
+            <!-- Service Price Editor -->
+            <div class="table-container glass-card" style="margin-top: 20px;">
+                <h3 class="chart-title"><i class="fa-solid fa-tags"></i> Service Base Prices (used for revenue estimate)</h3>
+                <table class="bookings-table" id="pricesTable">
+                    <thead>
+                        <tr>
+                            <th>AC Type</th>
+                            <th>Base Price (₹)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pricesTableBody">
+                        <tr><td colspan="3" class="table-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===================== REVIEWS SECTION ===================== -->
+        <div id="reviewsSection" class="hide">
+            <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-yellow"><i class="fa-solid fa-star"></i></div>
+                    <div class="stat-data">
+                        <h3 id="revAvgRating">-</h3>
+                        <p>Average Rating</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-icon stat-blue"><i class="fa-solid fa-comments"></i></div>
+                    <div class="stat-data">
+                        <h3 id="revTotalCount">0</h3>
+                        <p>Total Reviews</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container glass-card">
+                <table class="bookings-table" id="reviewsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Tracking Code</th>
+                            <th>Customer</th>
+                            <th>Rating</th>
+                            <th>Review</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewsTableBody">
+                        <tr><td colspan="6" class="table-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading reviews...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Employee Add/Edit Modal -->
         <div class="modal-overlay hide" id="employeeModal">
             <div class="modal-card glass-card animate-zoom">
@@ -258,6 +374,8 @@
     });
 </script>
 {% else %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endif %}
 {% endblock %}
+
