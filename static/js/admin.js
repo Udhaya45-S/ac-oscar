@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '/api/admin/logout';
         return;
     }
-
+ 
     let allBookings = [];
     let currentFilter = 'all';
     let allEmployees = [];
-
+ 
     // DOM Elements - Bookings
     const bookingsTableBody = document.getElementById('bookingsTableBody');
     const dbSearchInput = document.getElementById('dbSearchInput');
@@ -16,13 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminToast = document.getElementById('adminToast');
     const toastMessage = document.getElementById('toastMessage');
     const logoutBtn = document.getElementById('adminLogoutBtn');
-
+ 
     // Stat Count Elements
     const statTotal = document.getElementById('statTotal');
     const statBooked = document.getElementById('statBooked');
     const statProcessing = document.getElementById('statProcessing');
     const statCompleted = document.getElementById('statCompleted');
-
+ 
     // DOM Elements - Section switching
     const sectionTabs = document.querySelectorAll('[data-section]');
     const bookingsSection = document.getElementById('bookingsSection');
@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const analyticsSection = document.getElementById('analyticsSection');
     const reviewsSection = document.getElementById('reviewsSection');
     const allSections = { bookings: bookingsSection, employees: employeesSection, analytics: analyticsSection, reviews: reviewsSection };
-
+ 
     // Chart.js instances (destroyed & recreated on each analytics fetch)
     let chartInstances = {};
-
+ 
     // DOM Elements - Employees
     const employeesTableBody = document.getElementById('employeesTableBody');
     const btnAddEmployee = document.getElementById('btnAddEmployee');
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const empRole = document.getElementById('empRole');
     const empPhone = document.getElementById('empPhone');
     const empSalary = document.getElementById('empSalary');
-
+ 
     // Initialize Dashboard
     const initDashboard = async () => {
         if (logoutBtn) {
@@ -62,14 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSectionTabs();
         setupEmployeeUI();
     };
-
+ 
     // ===================== SECTION SWITCHING =====================
     const setupSectionTabs = () => {
         sectionTabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 sectionTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-
+ 
                 const section = tab.getAttribute('data-section');
                 Object.keys(allSections).forEach(key => {
                     if (key === section) {
@@ -78,16 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         allSections[key].classList.add('hide');
                     }
                 });
-
+ 
                 if (section === 'employees') fetchEmployees();
                 if (section === 'analytics') { fetchAnalytics(); fetchPrices(); }
                 if (section === 'reviews') fetchReviews();
             });
         });
     };
-
+ 
     // ===================== BOOKINGS =====================
-
+ 
     // Fetch Bookings from API
     const fetchBookings = async () => {
         try {
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
     };
-
+ 
     // Calculate Statistics Counters
     const calculateStats = () => {
         const counts = {
@@ -124,20 +124,20 @@ document.addEventListener('DOMContentLoaded', () => {
             Processing: 0,
             Completed: 0
         };
-
+ 
         allBookings.forEach(booking => {
             if (counts[booking.status] !== undefined) {
                 counts[booking.status]++;
             }
         });
-
+ 
         // Set Text
         statTotal.textContent = counts.Total;
         statBooked.textContent = counts.Booked;
         statProcessing.textContent = counts.Processing;
         statCompleted.textContent = counts.Completed;
     };
-
+ 
     // Filter and Search bookings logic
     const applyFilters = () => {
         const searchQuery = dbSearchInput.value.toLowerCase().trim();
@@ -151,13 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 booking.tracking_code.toLowerCase().includes(searchQuery) ||
                 booking.customer_name.toLowerCase().includes(searchQuery) ||
                 booking.phone.includes(searchQuery);
-
+ 
             return matchesTab && matchesSearch;
         });
-
+ 
         renderTable(filtered);
     };
-
+ 
     // Render bookings rows
     const renderTable = (bookings) => {
         if (bookings.length === 0) {
@@ -171,13 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             return;
         }
-
+ 
         bookingsTableBody.innerHTML = bookings.map(b => {
             // Check status select bindings
             const isBooked = b.status === 'Booked' ? 'selected' : '';
             const isProcessing = b.status === 'Processing' ? 'selected' : '';
             const isCompleted = b.status === 'Completed' ? 'selected' : '';
-
+ 
             // Format date nicely
             let formattedDate = b.created_at;
             try {
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     minute: '2-digit'
                 });
             } catch(e) {}
-
+ 
             return `
                 <tr id="row-${b.tracking_code}">
                     <td style="color: var(--text-secondary); font-size: 13px;">${formattedDate}</td>
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>
             `;
         }).join('');
-
+ 
         // Bind dropdown change handlers
         const dropdowns = bookingsTableBody.querySelectorAll('.status-dropdown');
         dropdowns.forEach(select => {
@@ -217,14 +217,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const initialStatus = select.getAttribute('data-status');
             select.style.borderColor = `var(--status-${initialStatus.toLowerCase()})`;
             select.style.color = `var(--status-${initialStatus.toLowerCase()})`;
-
+ 
             select.addEventListener('change', async (e) => {
                 const trackingCode = select.getAttribute('data-code');
                 const newStatus = e.target.value;
                 
                 // Disable temporarily
                 select.disabled = true;
-
+ 
                 try {
                     const response = await fetch('/api/admin/update-status', {
                         method: 'POST',
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         select.setAttribute('data-status', newStatus);
                         select.style.borderColor = `var(--status-${newStatus.toLowerCase()})`;
                         select.style.color = `var(--status-${newStatus.toLowerCase()})`;
-
+ 
                         // If tabs filter is active and status changes, we might want to refresh rows
                         if (currentFilter !== 'all') {
                             applyFilters();
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     };
-
+ 
     // Setup tabs listeners
     const setupTabs = () => {
         filterTabs.forEach(tab => {
@@ -281,14 +281,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     };
-
+ 
     // Setup live search listener
     const setupSearch = () => {
         dbSearchInput.addEventListener('input', () => {
             applyFilters();
         });
     };
-
+ 
     // Show dynamic toast popup
     const showToast = (message) => {
         toastMessage.textContent = message;
@@ -299,9 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
             adminToast.classList.add('hide');
         }, 3000);
     };
-
+ 
     // ===================== EMPLOYEES =====================
-
+ 
     const fetchEmployees = async () => {
         employeesTableBody.innerHTML = `
             <tr>
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
     };
-
+ 
     const renderEmployeesTable = () => {
         if (allEmployees.length === 0) {
             employeesTableBody.innerHTML = `
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             return;
         }
-
+ 
         employeesTableBody.innerHTML = allEmployees.map(emp => `
             <tr id="emp-row-${emp.id}">
                 <td class="col-cust">${emp.full_name}</td>
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             </tr>
         `).join('');
-
+ 
         // Bind edit buttons
         employeesTableBody.querySelectorAll('.btn-edit-emp').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (emp) openEmployeeModal(emp);
             });
         });
-
+ 
         // Bind delete buttons
         employeesTableBody.querySelectorAll('.btn-delete-emp').forEach(btn => {
             btn.addEventListener('click', async () => {
@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const emp = allEmployees.find(e => e.id === id);
                 if (!emp) return;
                 if (!confirm(`Delete salary record for ${emp.full_name}?`)) return;
-
+ 
                 try {
                     const response = await fetch(`/api/admin/employees/${id}`, { method: 'DELETE' });
                     const result = await response.json();
@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     };
-
+ 
     const openEmployeeModal = (emp = null) => {
         employeeError.classList.add('hide');
         employeeForm.reset();
@@ -411,11 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         employeeModal.classList.remove('hide');
     };
-
+ 
     const closeEmployeeModal = () => {
         employeeModal.classList.add('hide');
     };
-
+ 
     const setupEmployeeUI = () => {
         if (btnAddEmployee) {
             btnAddEmployee.addEventListener('click', () => openEmployeeModal());
@@ -423,23 +423,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnCloseEmployeeModal) {
             btnCloseEmployeeModal.addEventListener('click', closeEmployeeModal);
         }
-
+ 
         if (employeeForm) {
             employeeForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 employeeError.classList.add('hide');
-
+ 
                 const payload = {
                     full_name: empName.value.trim(),
                     role: empRole.value.trim(),
                     phone: empPhone.value.trim(),
                     monthly_salary: empSalary.value
                 };
-
+ 
                 const isEdit = !!empId.value;
                 const url = isEdit ? `/api/admin/employees/${empId.value}` : '/api/admin/employees';
                 const method = isEdit ? 'PUT' : 'POST';
-
+ 
                 try {
                     const response = await fetch(url, {
                         method,
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         body: JSON.stringify(payload)
                     });
                     const result = await response.json();
-
+ 
                     if (result.success) {
                         closeEmployeeModal();
                         showToast(isEdit ? 'Employee record updated' : 'Employee added');
@@ -462,11 +462,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     };
-
+ 
     // ===================== ANALYTICS =====================
-
+ 
     const CHART_COLORS = ['#00f5d4', '#5b8cff', '#ffb020', '#ff5c8a', '#8b5cf6', '#22c55e', '#f97316'];
-
+ 
     const fetchAnalytics = async () => {
         try {
             const response = await fetch('/api/admin/analytics');
@@ -478,19 +478,19 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(`Error loading analytics: ${err.message}`);
         }
     };
-
+ 
     const renderAnalytics = (data) => {
         document.getElementById('anTotalMonth').textContent = data.this_month.total_bookings;
         document.getElementById('anRevenueMonth').textContent = `₹${data.this_month.revenue_estimate.toLocaleString('en-IN')}`;
-
+ 
         const busyDaysEntries = Object.entries(data.busy_days);
         const busiestDay = busyDaysEntries.reduce((a, b) => (b[1] > a[1] ? b : a), ['-', -1]);
         document.getElementById('anBusiestDay').textContent = busiestDay[1] > 0 ? busiestDay[0] : '-';
-
+ 
         const busySlotsEntries = Object.entries(data.busy_slots);
         const busiestSlot = busySlotsEntries.reduce((a, b) => (b[1] > a[1] ? b : a), ['-', -1]);
         document.getElementById('anBusiestSlot').textContent = busiestSlot[1] > 0 ? busiestSlot[0].split(' (')[0] : '-';
-
+ 
         destroyChart('chartMonthlyTrend');
         chartInstances.chartMonthlyTrend = new Chart(document.getElementById('chartMonthlyTrend'), {
             type: 'bar',
@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             options: chartOptions({ dualAxis: true })
         });
-
+ 
         destroyChart('chartBusyDays');
         chartInstances.chartBusyDays = new Chart(document.getElementById('chartBusyDays'), {
             type: 'bar',
@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             options: chartOptions({})
         });
-
+ 
         destroyChart('chartBusySlots');
         chartInstances.chartBusySlots = new Chart(document.getElementById('chartBusySlots'), {
             type: 'doughnut',
@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             options: chartOptions({ legend: true })
         });
-
+ 
         destroyChart('chartAcType');
         chartInstances.chartAcType = new Chart(document.getElementById('chartAcType'), {
             type: 'doughnut',
@@ -534,14 +534,14 @@ document.addEventListener('DOMContentLoaded', () => {
             options: chartOptions({ legend: true })
         });
     };
-
+ 
     const destroyChart = (id) => {
         if (chartInstances[id]) {
             chartInstances[id].destroy();
             delete chartInstances[id];
         }
     };
-
+ 
     const chartOptions = ({ dualAxis, legend }) => {
         const base = {
             responsive: true,
@@ -566,9 +566,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return base;
     };
-
+ 
     // ===================== SERVICE PRICES =====================
-
+ 
     const fetchPrices = async () => {
         const pricesTableBody = document.getElementById('pricesTableBody');
         try {
@@ -576,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.status === 401) { window.location.reload(); return; }
             const result = await response.json();
             if (!result.success) throw new Error(result.error || 'Failed to fetch prices');
-
+ 
             pricesTableBody.innerHTML = Object.entries(result.prices).map(([acType, price]) => `
                 <tr>
                     <td>${acType}</td>
@@ -584,13 +584,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><button class="btn-icon btn-save-price" data-ac-type="${acType}" title="Save"><i class="fa-solid fa-check"></i></button></td>
                 </tr>
             `).join('');
-
+ 
             pricesTableBody.querySelectorAll('.btn-save-price').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const acType = btn.getAttribute('data-ac-type');
                     const input = pricesTableBody.querySelector(`.price-input[data-ac-type="${CSS.escape(acType)}"]`);
                     const newPrice = input.value;
-
+ 
                     try {
                         const response = await fetch('/api/admin/service-prices', {
                             method: 'POST',
@@ -612,9 +612,9 @@ document.addEventListener('DOMContentLoaded', () => {
             pricesTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color: var(--color-danger); padding: 20px;">Error: ${err.message}</td></tr>`;
         }
     };
-
+ 
     // ===================== REVIEWS =====================
-
+ 
     const fetchReviews = async () => {
         const reviewsTableBody = document.getElementById('reviewsTableBody');
         try {
@@ -622,12 +622,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.status === 401) { window.location.reload(); return; }
             const result = await response.json();
             if (!result.success) throw new Error(result.error || 'Failed to fetch reviews');
-
+ 
             const reviews = result.reviews;
             document.getElementById('revTotalCount').textContent = reviews.length;
             const avg = reviews.length ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : '-';
             document.getElementById('revAvgRating').textContent = reviews.length ? `${avg} ★` : '-';
-
+ 
             if (reviews.length === 0) {
                 reviewsTableBody.innerHTML = `
                     <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
@@ -636,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td></tr>`;
                 return;
             }
-
+ 
             reviewsTableBody.innerHTML = reviews.map(r => `
                 <tr>
                     <td style="color: var(--text-secondary); font-size: 13px;">${r.created_at}</td>
@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><button class="btn-icon btn-delete-review" data-id="${r.id}" title="Delete"><i class="fa-solid fa-trash"></i></button></td>
                 </tr>
             `).join('');
-
+ 
             reviewsTableBody.querySelectorAll('.btn-delete-review').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const id = parseInt(btn.getAttribute('data-id'));
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reviewsTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--color-danger); padding: 20px;">Error: ${err.message}</td></tr>`;
         }
     };
-
+ 
     // Run Dashboard Init
     initDashboard();
 });
