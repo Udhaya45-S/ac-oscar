@@ -136,9 +136,19 @@ def book_repair():
  
     try:
         code = db.add_booking(name, phone, email, ac_type, issue, pref_date, pref_time)
-        # Notify the customer on their booking phone number. This never
-        # blocks or fails the booking itself — see notifications.py.
+        # Notify the customer on their booking phone number, and notify the
+        # business owner on WhatsApp. Neither ever blocks or fails the
+        # booking itself — see notifications.py.
         notifications.send_booking_confirmation_sms(phone, name, code)
+        notifications.send_owner_whatsapp_notification({
+            'tracking_code': code,
+            'customer_name': name,
+            'phone': phone,
+            'ac_type': ac_type,
+            'issue_description': issue,
+            'preferred_date': pref_date,
+            'preferred_time': pref_time,
+        })
         return jsonify({'success': True, 'tracking_code': code})
     except Exception as e:
         app.logger.exception("Error adding booking")
@@ -505,3 +515,4 @@ if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
+ 
