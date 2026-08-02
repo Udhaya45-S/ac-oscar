@@ -209,11 +209,47 @@
                         <p id="resIssue">-</p>
                     </div>
                 </div>
+
+                <!-- Rate this service — only shown when status is Completed -->
+                <div id="reviewPrompt" class="review-prompt hide">
+                    <h4><i class="fa-solid fa-star"></i> How was our service?</h4>
+                    <form id="reviewForm">
+                        <div class="star-rating" id="starRating">
+                            <i class="fa-solid fa-star star-input" data-value="1"></i>
+                            <i class="fa-solid fa-star star-input" data-value="2"></i>
+                            <i class="fa-solid fa-star star-input" data-value="3"></i>
+                            <i class="fa-solid fa-star star-input" data-value="4"></i>
+                            <i class="fa-solid fa-star star-input" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="reviewRatingValue" value="0">
+                        <textarea id="reviewText" placeholder="Tell us about your experience (optional)" rows="2"></textarea>
+                        <button type="submit" class="btn btn-primary btn-block" id="btnSubmitReview">Submit Review</button>
+                    </form>
+                    <p id="reviewAlreadySubmitted" class="hide">
+                        <i class="fa-solid fa-circle-check"></i> Thanks — you've already reviewed this booking!
+                    </p>
+                </div>
             </div>
         </div>
         <div id="trackingError" class="tracking-error-message hide">
             <i class="fa-solid fa-circle-xmark"></i>
             <span id="trackingErrorText">No booking found with this tracking code.</span>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="sub-title">What Customers Say</span>
+            <h2>Real Reviews from Real Customers</h2>
+            <p id="testimonialsSummary">Loading reviews...</p>
+        </div>
+        <div class="testimonials-grid" id="testimonialsGrid">
+            <div class="table-loading" style="text-align:center; padding: 20px; color: var(--text-muted);">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Loading reviews...
+            </div>
         </div>
     </div>
 </section>
