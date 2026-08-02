@@ -1,0 +1,41 @@
+New Feature: WhatsApp Notification to YOU on Every Booking
+What changed
+File	What changed
+notifications.py	Added send_owner_whatsapp_notification() — sends a WhatsApp message to your number whenever a customer books
+app.py	Calls it right after a booking is saved (/api/book)
+.env.example	Added TWILIO_WHATSAPP_FROM and OWNER_WHATSAPP_NUMBER
+
+This is separate from the customer-facing WhatsApp button (that one is just a link, no setup needed). This new one is a real automated message that lands in your WhatsApp whenever someone books — needs Twilio.
+
+Why WhatsApp Sandbox instead of the SMS route
+
+The SMS setup earlier got stuck on India phone number compliance (KYC documents). WhatsApp Sandbox skips all of that — it's meant for exactly this: notifying yourself, not messaging random customers. Free, works immediately.
+
+Limitation: sandbox messages only reach numbers that have joined the sandbox (i.e., you — one-time step below). This is fine since only you need to receive these.
+
+Setup Steps
+1. Join the Twilio WhatsApp Sandbox (one-time, on your phone)
+Go to Twilio Console → search "Try it out" or "WhatsApp" in the left sidebar → "Send a WhatsApp message" / "Sandbox settings".
+It'll show a WhatsApp number (+1 415 523 8886) and a join code like join <two-words>.
+On your phone, open WhatsApp and send that exact join <code> message to that number.
+You'll get a confirmation reply — you're now connected to the sandbox.
+2. Add Environment Variables on Render
+
+Render dashboard → ac-oscar service → Environment:
+
+Key	Value
+TWILIO_ACCOUNT_SID	(same one from earlier SMS setup)
+TWILIO_AUTH_TOKEN	(same one from earlier SMS setup)
+OWNER_WHATSAPP_NUMBER	your number, e.g. 9150821143
+TWILIO_WHATSAPP_FROM	whatsapp:+14155238886 (leave as default — this is Twilio's sandbox number, not something you buy)
+
+You do not need TWILIO_FROM_NUMBER for this feature (that one's only for the customer SMS feature, which is separate and still optional).
+
+3. Save → Render redeploys automatically
+4. Test
+
+Make a test booking on your site → within a few seconds you should get a WhatsApp message on your phone with the booking details (tracking code, customer name, phone, AC type, issue, preferred slot).
+
+Note on the Sandbox
+The sandbox is free and has no message limit for testing, but Twilio may require you to re-join every ~72 hours of inactivity (they'll remind you if so).
+If you later want a permanent, always-on WhatsApp sender for your business (not just a sandbox), that requires WhatsApp Business API approval through Twilio — a longer process with its own verification. Not needed for just notifying yourself; only relevant if you also want to message customers on WhatsApp automatically in the future.
