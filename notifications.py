@@ -1,4 +1,3 @@
-Notifications · PY
 import os
  
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
@@ -140,4 +139,3 @@ def send_owner_whatsapp_notification(booking):
     except Exception as e:
         print(f"ERROR sending WhatsApp notification to owner: {e}")
         return False
- 
